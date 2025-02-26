@@ -1,4 +1,4 @@
-package com.anam145.anamwallet.server;
+package com.anam145.anamwallet;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
