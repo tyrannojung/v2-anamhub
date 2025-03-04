@@ -1,5 +1,7 @@
 package com.anam145.anamwallet.controller;
 
+import com.anam145.anamwallet.service.FileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +16,8 @@ import java.nio.file.Paths;
 @Controller
 public class UploadFileController {
 
-    @Value("${file.provide.dir}")
-    private String UPLOAD_DIR;
+    @Autowired
+    private FileService fileService;
 
     @GetMapping("/upload")
     public String showUploadForm(Model model) {
@@ -24,26 +26,21 @@ public class UploadFileController {
 
 
     @PostMapping("/upload")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file, Model model) {
-        if (file.isEmpty()) {
-            model.addAttribute("message", "파일을 선택하세요.");
+    public String handleFileUpload(
+            @RequestParam("apkFile") MultipartFile apkFile,
+            @RequestParam("moduleEntryClass") String moduleEntryClass,
+            @RequestParam("imgFile") MultipartFile imgFile,
+            @RequestParam("moduleName") String moduleName,
+            Model model) {
+
+        if (apkFile.isEmpty() || imgFile.isEmpty()) {
+            model.addAttribute("message", "모든 파일을 입력하세요");
             return "upload";
         }
 
-        try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            if (!uploadPath.toFile().exists()) {
-                uploadPath.toFile().mkdirs();
-            }
+        int apkReturnCode = fileService.saveFile(apkFile, moduleName);
+        int imgReturnCode = fileService.saveFile(imgFile, moduleName);
 
-            String fileName = file.getOriginalFilename();
-            File destFile = new File(uploadPath.toFile(), fileName);
-            file.transferTo(destFile);
-
-            model.addAttribute("message", "파일 업로드 성공: " + fileName);
-        } catch (IOException e) {
-            model.addAttribute("message", "파일 업로드 실패: " + e.getMessage());
-        }
         return "upload";
     }
 }

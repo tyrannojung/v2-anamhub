@@ -1,5 +1,7 @@
 package com.anam145.anamwallet.controller;
 
+import com.anam145.anamwallet.service.FileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -21,36 +23,27 @@ import java.nio.file.Paths;
 @RequestMapping("/download")
 public class DownloadFileController {
 
-    @Value("${file.provide.dir}")
-    private String FILE_DIRECTORY;
+    @Autowired
+    private FileService fileService;
+
 
     @GetMapping("/apk/{filename}")
-    public ResponseEntity<Resource> getApk(@PathVariable String filename) throws IOException {
-        Path filePath = Paths.get(FILE_DIRECTORY).resolve(filename).normalize();
-        Resource resource = new UrlResource(filePath.toUri());
-
-        if (!resource.exists()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다.");
-        }
+    public ResponseEntity<Resource> getApk(@PathVariable String moduleName) {
+        Resource resource = fileService.fetchFile(moduleName);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + moduleName + "\"")
                 .body(resource);
     }
 
     @GetMapping("/img/{filename}")
-    public ResponseEntity<Resource> getImg(@PathVariable String filename) throws IOException {
-        Path filePath = Paths.get(FILE_DIRECTORY).resolve(filename).normalize();
-        Resource resource = new UrlResource(filePath.toUri());
-
-        if (!resource.exists()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다.");
-        }
+    public ResponseEntity<Resource> getImg(@PathVariable String moduleName){
+        Resource resource = fileService.fetchFile(null);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + moduleName + "\"")
                 .body(resource);
     }
 

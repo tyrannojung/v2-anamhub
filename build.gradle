@@ -37,6 +37,11 @@ dependencies {
 	//Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	//DB
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // jpa
+	implementation 'org.xerial:sqlite-jdbc:3.49.1.0' // sqlite jdbc
+	implementation 'org.hibernate.orm:hibernate-community-dialects' // diarect
 }
 
 tasks.named('test') {
