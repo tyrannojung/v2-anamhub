@@ -1,39 +1,46 @@
 package com.anam145.anamwallet.service;
 
-import com.anam145.anamwallet.dao.ModuleDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 @Service
 public class FileService {
 
-    @Value("${file.provide.dir}")
-    private String UPLOAD_DIR;
+    @Value("${file.apk.provide.dir}")
+    private String APK_UPLOAD_DIR;
+    @Value("${file.img.provide.dir}")
+    private String IMG_UPLOAD_DIR;
 
-    @Autowired
-    private ModuleDao apkMetaDao;
-
-    public int saveFile(MultipartFile file, String moduleName){
+    private int saveFile(MultipartFile file, String moduleName, String uploadDir){
         try {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path uploadPath = Paths.get(uploadDir);
+
             if (!uploadPath.toFile().exists()) {
                 uploadPath.toFile().mkdirs();
             }
 
-            String fileName = file.getOriginalFilename();
-            File destFile = new File(uploadPath.toFile(), fileName);
+            String originalFileName = file.getOriginalFilename();
+            String extension = "";
+
+            // 확장자 추출
+            if (originalFileName != null && originalFileName.contains(".")) {
+                extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            }
+
+            // moduleName.확장자
+            File destFile = new File(uploadPath.toFile(), moduleName + extension);
             file.transferTo(destFile);
 
             return 0;
@@ -41,24 +48,43 @@ public class FileService {
             System.err.print(e.toString());
             return 1;
         }
-
-
     }
 
-    public Resource fetchFile(String moduleName){
-//        try {
-//            Path filePath = Paths.get(UPLOAD_DIR).resolve(fileName).normalize();
-//            Resource resource = null;
-//            resource = new UrlResource(filePath.toUri());
-//
-//            if (!resource.exists()) {
-//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다.");
-//            }
-//            return resource;
-//
-//        } catch (MalformedURLException e) {
-//            throw new RuntimeException(e);
-//        }
-        return null;
+    private Resource fetchFile(String moduleName, String dir) {
+        try {
+            Path directoryPath = Paths.get(dir);
+            Optional<Path> filePath = Files.walk(directoryPath)
+                    .filter(path -> path.getFileName().toString().startsWith(moduleName))  // moduleName과 일치하는 파일 이름 검색
+                    .filter(path -> !Files.isDirectory(path))  // 디렉토리 제외
+                    .findFirst();  // 첫 번째 매칭 파일 반환
+
+            if (filePath.isPresent()) {
+                return new UrlResource(filePath.get().toUri());
+            } else {
+                throw new RuntimeException("파일을 찾을 수 없습니다.");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("파일 검색 중 오류가 발생했습니다.", e);
+        }
+    }
+
+
+    public int saveApkFile(MultipartFile file, String moduleName) {
+        return saveFile(file, moduleName, APK_UPLOAD_DIR);
+    }
+
+
+    public int saveImgFile(MultipartFile file, String moduleName) {
+        return saveFile(file, moduleName, IMG_UPLOAD_DIR);
+    }
+
+
+    public Resource fetchApkFile(String moduleName){
+        return fetchFile(moduleName, APK_UPLOAD_DIR);
+    }
+
+
+    public Resource fetchImgFile(String moduleName){
+        return fetchFile(moduleName, IMG_UPLOAD_DIR);
     }
 }

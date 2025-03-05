@@ -1,28 +1,31 @@
 package com.anam145.anamwallet.controller;
 
+import com.anam145.anamwallet.dto.ModuleDto;
 import com.anam145.anamwallet.service.FileService;
+import com.anam145.anamwallet.service.ModuleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Locale;
 
 @Controller
-public class UploadFileController {
+public class FileUploadController {
 
     @Autowired
     private FileService fileService;
+    @Autowired
+    private ModuleService moduleService;
+
+
 
     @GetMapping("/upload")
     public String showUploadForm(Model model) {
         return "upload";
     }
+
 
 
     @PostMapping("/upload")
@@ -38,9 +41,18 @@ public class UploadFileController {
             return "upload";
         }
 
-        int apkReturnCode = fileService.saveFile(apkFile, moduleName);
-        int imgReturnCode = fileService.saveFile(imgFile, moduleName);
+        moduleName = moduleName.toLowerCase();
+        int apkReturnCode = fileService.saveApkFile(apkFile, moduleName);
+        int imgReturnCode = fileService.saveImgFile(imgFile, moduleName);
+
+        moduleService.save(new ModuleDto(moduleName, moduleEntryClass));
 
         return "upload";
     }
+
+//    @ExceptionHandler({IOException.class})
+//    public ResponseEntity<String> handle(Exception ex) {
+//
+//    }
+
 }

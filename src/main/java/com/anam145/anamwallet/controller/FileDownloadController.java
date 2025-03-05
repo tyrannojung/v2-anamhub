@@ -1,45 +1,30 @@
 package com.anam145.anamwallet.controller;
 
+import com.anam145.anamwallet.dto.ModuleDto;
 import com.anam145.anamwallet.service.FileService;
+import com.anam145.anamwallet.service.ModuleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
 
 @RestController
 @RequestMapping("/download")
-public class DownloadFileController {
+public class FileDownloadController {
 
     @Autowired
     private FileService fileService;
 
-
-    @GetMapping("/apk/{filename}")
-    public ResponseEntity<Resource> getApk(@PathVariable String moduleName) {
-        Resource resource = fileService.fetchFile(moduleName);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + moduleName + "\"")
-                .body(resource);
-    }
-
-    @GetMapping("/img/{filename}")
-    public ResponseEntity<Resource> getImg(@PathVariable String moduleName){
-        Resource resource = fileService.fetchFile(null);
+    @GetMapping("/apk/{moduleName}")
+    public ResponseEntity<Resource> getApkFile(@PathVariable String moduleName) {
+        Resource resource = fileService.fetchApkFile(moduleName);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -47,6 +32,15 @@ public class DownloadFileController {
                 .body(resource);
     }
 
+    @GetMapping("/img/{moduleName}")
+    public ResponseEntity<Resource> getImgFile(@PathVariable String moduleName){
+        Resource resource = fileService.fetchImgFile(moduleName);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + moduleName + "\"")
+                .body(resource);
+    }
 
 
 
