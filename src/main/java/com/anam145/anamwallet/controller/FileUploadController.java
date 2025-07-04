@@ -38,7 +38,9 @@ public class FileUploadController {
         miniAppService.save(new MiniAppEntity(
                 null,
                 file.getOriginalFilename(),
-                type
+                type,
+                null,
+                null
         ));
         fileService.saveMiniAppFile(file, file.getOriginalFilename());
 

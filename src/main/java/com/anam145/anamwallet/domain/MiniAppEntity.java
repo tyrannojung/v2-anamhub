@@ -18,5 +18,7 @@ public class MiniAppEntity {
     String name;
     @Enumerated(EnumType.STRING)
     MiniAppType type;
+    String iconPath;
+    String balance;
 }
 
