@@ -14,28 +14,30 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow-lg p-4">
-                <h2 class="text-center mb-4">파일 업로드</h2>
+                <h2 class="text-center mb-4">mini app 업로드</h2>
 
                 <form method="post" enctype="multipart/form-data" th:action="@{/upload}" class="mb-3">
-                    <div class="mb-3">
-                        <label class="form-label">APK 파일 업로드</label>
-                        <input type="file" name="apkFile" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">이미지 파일 업로드</label>
-                        <input type="file" name="imgFile" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">코인 모듈 이름</label>
-                        <input type="text" name="moduleName" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">코인 모듈 Main Class</label>
-                        <input type="text" name="moduleEntryClass" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">APK 업로드</button>
-                </form>
 
+                    <!-- Type 선택 -->
+                    <div class="mb-3">
+                        <label class="form-label">Mini App Type</label>
+                        <select name="type" class="form-select" required>
+                            <option value="" disabled selected>타입을 선택하세요</option>
+                            <option value="BLOCKCHAIN">BLOCKCHAIN</option>
+                            <option value="APP">APP</option>
+                        </select>
+                    </div>
+
+                    <!-- 파일 선택 -->
+                    <div class="mb-3">
+                        <label class="form-label">mini app 파일 업로드</label>
+                        <input type="file" name="miniAppFile" class="form-control" required>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">업로드</button>
+                    </div>
+                </form>
 
                 <p th:text="${message}" class="text-danger text-center mt-3"></p>
             </div>

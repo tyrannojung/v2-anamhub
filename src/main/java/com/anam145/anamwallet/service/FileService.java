@@ -18,12 +18,10 @@ import java.util.Optional;
 @Service
 public class FileService {
 
-    @Value("${file.apk.provide.dir}")
-    private String APK_UPLOAD_DIR;
-    @Value("${file.img.provide.dir}")
-    private String IMG_UPLOAD_DIR;
+    @Value("${file.mini-app.provide.dir}")
+    private String MINI_APP_UPLOAD_DIR;
 
-    private int saveFile(MultipartFile file, String moduleName, String uploadDir){
+    private int saveFile(MultipartFile file, String miniAppName, String uploadDir){
         try {
             Path uploadPath = Paths.get(uploadDir);
 
@@ -40,7 +38,7 @@ public class FileService {
             }
 
             // moduleName.확장자
-            File destFile = new File(uploadPath.toFile(), moduleName + extension);
+            File destFile = new File(uploadPath.toFile(), miniAppName + extension);
             file.transferTo(destFile);
 
             return 0;
@@ -50,11 +48,11 @@ public class FileService {
         }
     }
 
-    private Resource fetchFile(String moduleName, String dir) {
+    private Resource fetchFile(String miniAppName, String dir) {
         try {
             Path directoryPath = Paths.get(dir);
             Optional<Path> filePath = Files.walk(directoryPath)
-                    .filter(path -> path.getFileName().toString().startsWith(moduleName))  // moduleName과 일치하는 파일 이름 검색
+                    .filter(path -> path.getFileName().toString().startsWith(miniAppName))  // moduleName과 일치하는 파일 이름 검색
                     .filter(path -> !Files.isDirectory(path))  // 디렉토리 제외
                     .findFirst();  // 첫 번째 매칭 파일 반환
 
@@ -69,22 +67,12 @@ public class FileService {
     }
 
 
-    public int saveApkFile(MultipartFile file, String moduleName) {
-        return saveFile(file, moduleName, APK_UPLOAD_DIR);
+    public int saveMiniAppFile(MultipartFile file, String miniAppName) {
+        return saveFile(file, miniAppName, MINI_APP_UPLOAD_DIR);
     }
 
 
-    public int saveImgFile(MultipartFile file, String moduleName) {
-        return saveFile(file, moduleName, IMG_UPLOAD_DIR);
-    }
-
-
-    public Resource fetchApkFile(String moduleName){
-        return fetchFile(moduleName, APK_UPLOAD_DIR);
-    }
-
-
-    public Resource fetchImgFile(String moduleName){
-        return fetchFile(moduleName, IMG_UPLOAD_DIR);
+    public Resource fetchMiniAppFile(String id){
+        return fetchFile(id, MINI_APP_UPLOAD_DIR);
     }
 }
