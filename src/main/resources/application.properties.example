@@ -1,0 +1,36 @@
+spring.application.name=server
+
+# ===== FILE UPLOAD SETTINGS =====
+# Mini App file storage directory
+# Windows: file.mini-app.provide.dir=C:\\anamhub\\miniapp-files
+# Mac/Linux: file.mini-app.provide.dir=/var/anamhub/miniapp-files
+# Development: file.mini-app.provide.dir=./uploads/miniapp-files
+file.mini-app.provide.dir=CHANGE_TO_YOUR_UPLOAD_PATH
+
+# ===== DATABASE SETTINGS =====
+# SQLite configuration (file-based DB)
+spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+# Options: create(reset), update(preserve), validate(check only), none
+spring.jpa.hibernate.ddl-auto=update
+
+# SQLite file path
+# Relative: jdbc:sqlite:module.db (project root)
+# Absolute: jdbc:sqlite:/var/anamhub/data/module.db
+spring.datasource.url=jdbc:sqlite:module.db
+spring.datasource.driver-class-name=org.sqlite.JDBC
+# SQLite doesn't require username/password but keeping for compatibility
+spring.datasource.username=admin
+spring.datasource.password=CHANGE_TO_YOUR_PASSWORD
+
+# ===== LOGGING SETTINGS =====
+# Use DEBUG only in development environment
+logging.level.org.springframework.web=INFO
+logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter=INFO
+
+# ===== HTTPS SETTINGS (Optional) =====
+# Uncomment to enable HTTPS
+#server.port=8443
+#server.ssl.key-store=classpath:keystore.p12
+#server.ssl.key-store-password=CHANGE_TO_YOUR_SSL_PASSWORD
+#server.ssl.key-store-type=PKCS12
+#server.ssl.key-alias=myssl

@@ -35,4 +35,14 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Application Properties ###
 src/main/resources/application.properties
+!src/main/resources/application.properties.example
+
+### Database ###
+module.db
+*.db
+
+### Local Scripts ###
+setup-server.sh
