@@ -28,7 +28,7 @@ java -jar build/libs/server-0.0.1-SNAPSHOT.jar
 ```
 
 ## API Endpoints
-- `GET /list` - List all mini-apps
-- `GET /list/{appId}` - Get specific mini-app
-- `POST /upload` - Upload mini-app
-- `GET /download/{fileName}` - Download mini-app
+- `GET /miniapps` - List all mini-apps
+- `GET /miniapps/{appId}` - Get specific mini-app
+- `GET /miniapps/{appId}/download` - Download mini-app file
+- `POST /` - Upload mini-app (upload page)

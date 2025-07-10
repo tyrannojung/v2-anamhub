@@ -16,13 +16,13 @@ public class MiniAppListController {
     private MiniAppService miniAppService;
 
 
-    @GetMapping("/list")
+    @GetMapping("/miniapps")
     public List<MiniAppEntity> getAvailableMiniApps(){
         return miniAppService.listAll();
     }
 
 
-    @GetMapping("/list/{appId}")
+    @GetMapping("/miniapps/{appId}")
     public MiniAppEntity getMiniApp(@PathVariable String appId){
         return miniAppService.get(appId);
     }

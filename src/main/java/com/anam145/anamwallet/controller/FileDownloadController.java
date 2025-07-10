@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/download")
 public class FileDownloadController {
 
     @Autowired
@@ -22,7 +21,7 @@ public class FileDownloadController {
     @Autowired
     private MiniAppService miniAppService;
 
-    @GetMapping("/miniApp/{id}")
+    @GetMapping("/miniapps/{id}/download")
     public ResponseEntity<Resource> getMiniAppFile(@PathVariable String id) {
         MiniAppEntity miniAppEntity = miniAppService.get(id);
         Resource resource = fileService.fetchMiniAppFile(miniAppEntity.getFileName());
