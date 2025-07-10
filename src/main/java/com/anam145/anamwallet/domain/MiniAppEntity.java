@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -15,10 +16,14 @@ public class MiniAppEntity {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String appId;
-    String name;
+    
+    String fileName;  // zip 파일명
+    
     @Enumerated(EnumType.STRING)
     MiniAppType type;
-    String iconPath;
-    String balance;
+    
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt = new Date();
 }
 
