@@ -1,5 +1,10 @@
 spring.application.name=server
 
+# ===== SERVER CONFIGURATION =====
+# Allow access from all IPs (for production server)
+server.address=0.0.0.0
+server.port=8080
+
 # ===== FILE UPLOAD SETTINGS =====
 # Mini App file storage directory
 # Windows: file.mini-app.provide.dir=C:\\anamhub\\miniapp-files
