@@ -25,11 +25,11 @@ public class FileDownloadController {
     @GetMapping("/miniApp/{id}")
     public ResponseEntity<Resource> getMiniAppFile(@PathVariable String id) {
         MiniAppEntity miniAppEntity = miniAppService.get(id);
-        Resource resource = fileService.fetchMiniAppFile(miniAppEntity.getName());
+        Resource resource = fileService.fetchMiniAppFile(miniAppEntity.getFileName());
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + miniAppEntity.getName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + miniAppEntity.getFileName() + "\"")
                 .body(resource);
     }
 }
