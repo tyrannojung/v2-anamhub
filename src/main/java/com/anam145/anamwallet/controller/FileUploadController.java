@@ -19,13 +19,13 @@ public class FileUploadController {
     private MiniAppService miniAppService;
 
 
-    @GetMapping("/upload")
+    @GetMapping("/")
     public String showUploadForm(Model model) {
         return "upload";
     }
 
 
-    @PostMapping("/upload")
+    @PostMapping("/")
     public String handleFileUpload(@RequestParam("miniAppFile") MultipartFile file,
                                    @RequestParam("type") MiniAppType type,
                                    Model model) {
