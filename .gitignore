@@ -46,3 +46,23 @@ module.db
 
 ### Local Scripts ###
 setup-server.sh
+
+### SSL/Security ###
+*.p12
+*.jks
+*.pem
+*.key
+*.crt
+*.cer
+
+### Logs ###
+*.log
+logs/
+
+### OS Files ###
+.DS_Store
+Thumbs.db
+
+### Environment ###
+.env
+.env.*
