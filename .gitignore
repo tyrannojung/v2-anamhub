@@ -46,6 +46,7 @@ module.db
 
 ### Local Scripts ###
 setup-server.sh
+reset-db.sh
 
 ### SSL/Security ###
 *.p12

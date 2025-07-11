@@ -32,10 +32,3 @@ spring.datasource.password=CHANGE_TO_YOUR_PASSWORD
 logging.level.org.springframework.web=INFO
 logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter=INFO
 
-# ===== HTTPS SETTINGS (Optional) =====
-# Uncomment to enable HTTPS
-#server.port=8443
-#server.ssl.key-store=classpath:keystore.p12
-#server.ssl.key-store-password=CHANGE_TO_YOUR_SSL_PASSWORD
-#server.ssl.key-store-type=PKCS12
-#server.ssl.key-alias=myssl
