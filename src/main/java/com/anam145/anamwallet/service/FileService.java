@@ -29,16 +29,8 @@ public class FileService {
                 uploadPath.toFile().mkdirs();
             }
 
-            String originalFileName = file.getOriginalFilename();
-            String extension = "";
-
-            // 확장자 추출
-            if (originalFileName != null && originalFileName.contains(".")) {
-                extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-            }
-
-            // moduleName.확장자
-            File destFile = new File(uploadPath.toFile(), miniAppName + extension);
+            // miniAppName이 이미 전체 파일명이므로 그대로 사용
+            File destFile = new File(uploadPath.toFile(), miniAppName);
             file.transferTo(destFile);
 
             return 0;

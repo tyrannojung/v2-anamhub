@@ -58,8 +58,10 @@
         <button type="submit" class="submit-button">Upload Mini-App</button>
       </form>
 
-      <!-- Error Message -->
-      <div th:if="${message}" class="error-message" th:text="${message}"></div>
+      <!-- Message Display -->
+      <div th:if="${message}" 
+           th:class="${success} ? 'success-message' : 'error-message'" 
+           th:text="${message}"></div>
     </div>
 
     <script th:src="@{/js/upload.js}"></script>
