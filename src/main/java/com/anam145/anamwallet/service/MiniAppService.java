@@ -2,34 +2,45 @@ package com.anam145.anamwallet.service;
 
 
 import com.anam145.anamwallet.domain.MiniAppEntity;
+import com.anam145.anamwallet.exception.MiniAppNotFoundException;
 import com.anam145.anamwallet.repository.MiniAppRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class MiniAppService {
-    @Autowired
-    private MiniAppRepository repo;
+    
+    private final MiniAppRepository repo;
 
-    public MiniAppEntity get(String appId){
-        return repo.findById(appId)
-                .orElseThrow(() -> new NoSuchElementException("MiniApp not found with id: " + appId));
+    public MiniAppEntity get(String appId) {
+        MiniAppEntity entity = repo.findByAppId(appId);
+        if (entity == null) {
+            throw new MiniAppNotFoundException(appId);
+        }
+        return entity;
+    }
+    
+    public boolean existsByAppId(String appId) {
+        return repo.existsByAppId(appId);
     }
 
     public List<MiniAppEntity> listAll() {
         return repo.findAll();
     }
 
+    @Transactional
     public void save(MiniAppEntity miniAppEntity) {
         repo.save(miniAppEntity);
     }
 
+    @Transactional
     public void delete(String appId) {
-        repo.deleteById(appId);
+        MiniAppEntity entity = get(appId);
+        repo.delete(entity);
     }
 }

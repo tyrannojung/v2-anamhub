@@ -42,6 +42,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // jpa
 	implementation 'org.xerial:sqlite-jdbc:3.49.1.0' // sqlite jdbc
 	implementation 'org.hibernate.orm:hibernate-community-dialects' // diarect
+	
+	//Utils
+	implementation 'com.aventrix.jnanoid:jnanoid:2.0.0' // nanoid
 }
 
 tasks.named('test') {

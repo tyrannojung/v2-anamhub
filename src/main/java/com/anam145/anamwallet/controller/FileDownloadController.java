@@ -1,9 +1,11 @@
 package com.anam145.anamwallet.controller;
 
 import com.anam145.anamwallet.domain.MiniAppEntity;
+import com.anam145.anamwallet.exception.FileProcessingException;
 import com.anam145.anamwallet.service.FileService;
 import com.anam145.anamwallet.service.MiniAppService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,32 +15,37 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
+@RequestMapping("/miniapps")
+@RequiredArgsConstructor
 public class FileDownloadController {
 
-    @Autowired
-    private FileService fileService;
-    @Autowired
-    private MiniAppService miniAppService;
+    private final FileService fileService;
+    private final MiniAppService miniAppService;
 
-    @GetMapping("/miniapps/{id}/download")
-    public ResponseEntity<Resource> getMiniAppFile(@PathVariable String id) {
+    @GetMapping("/{appId}/download")
+    public ResponseEntity<Resource> downloadMiniApp(@PathVariable String appId) {
+        log.info("Download request for mini-app: {}", appId);
+        
         try {
-            MiniAppEntity miniAppEntity = miniAppService.get(id);
-            Resource resource = fileService.fetchMiniAppFile(miniAppEntity.getFileName());
+            MiniAppEntity miniApp = miniAppService.get(appId);
+            Resource resource = fileService.fetchMiniAppFile(miniApp.getFileName());
             
-            // Check if resource exists and is readable
             if (!resource.exists() || !resource.isReadable()) {
-                throw new RuntimeException("Could not read file: " + miniAppEntity.getFileName());
+                throw new FileProcessingException("Could not read file: " + miniApp.getFileName());
             }
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + miniAppEntity.getFileName() + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, 
+                           String.format("attachment; filename=\"%s\"", miniApp.getFileName()))
                     .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(resource.contentLength()))
                     .body(resource);
+                    
         } catch (Exception e) {
-            throw new RuntimeException("File download failed: " + e.getMessage());
+            log.error("Failed to download mini-app {}: ", appId, e);
+            throw new FileProcessingException("File download failed: " + e.getMessage(), e);
         }
     }
 }
