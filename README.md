@@ -14,7 +14,8 @@ cp src/main/resources/application.properties.example src/main/resources/applicat
 
 Edit `application.properties` with your settings:
 
-- File upload directory path
+- File upload directory path (`file.mini-app.provide.dir`)
+- Icon storage directory path (`file.icon.dir`)
 - Database location (SQLite)
 - Server port (default: 9090)
 
@@ -76,7 +77,8 @@ GET /miniapps
       "type": "BLOCKCHAIN",
       "createdAt": "2025-01-11T15:30:45.123+09:00",
       "name": "DeFi Wallet",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "iconUrl": "/miniapps/com.anam.V1StGXR8_Z5jdHi6B/icon"
     },
     {
       "appId": "com.anam.9D3_bLmN7xK4Hf2Qw",
@@ -84,7 +86,8 @@ GET /miniapps
       "type": "BLOCKCHAIN",
       "createdAt": "2025-01-10T10:15:30.456+09:00",
       "name": "NFT Marketplace",
-      "version": "2.1.0"
+      "version": "2.1.0",
+      "iconUrl": "/miniapps/com.anam.9D3_bLmN7xK4Hf2Qw/icon"
     }
   ],
   "timestamp": "2025-01-11T16:45:30.123",
@@ -132,7 +135,8 @@ GET /miniapps/{appId}
     "type": "BLOCKCHAIN",
     "createdAt": "2025-01-11T15:30:45.123+09:00",
     "name": "DeFi Wallet",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "iconUrl": "/miniapps/com.anam.V1StGXR8_Z5jdHi6B/icon"
   },
   "timestamp": "2025-01-11T16:45:30.123",
   "code": 200
@@ -206,7 +210,60 @@ _File not found (500)_
 
 ---
 
-### 4. Upload Page
+### 4. Get Mini-App Icon
+
+Get the icon image of a specific mini-app.
+
+**Request**
+
+```http
+GET /miniapps/{appId}/icon
+```
+
+**Parameters**
+
+- `appId` (path parameter): Unique app identifier (format: com.anam.{nanoId})
+
+**Success Response (200 OK)**
+
+```
+HTTP/1.1 200 OK
+Content-Type: image/png
+Cache-Control: public, max-age=86400
+Content-Length: 2048
+
+[Binary image data]
+```
+
+**Error Responses**
+
+_Mini-app not found (404)_
+
+```json
+{
+  "success": false,
+  "message": "MiniApp not found with id: com.anam.invalid-id",
+  "data": null,
+  "timestamp": "2025-01-11T16:45:30.123",
+  "code": 404
+}
+```
+
+_Icon not found (500)_
+
+```json
+{
+  "success": false,
+  "message": "An unexpected error occurred: Icon retrieval failed: Could not read icon file",
+  "data": null,
+  "timestamp": "2025-01-11T16:45:30.123",
+  "code": 500
+}
+```
+
+---
+
+### 5. Upload Page
 
 Web interface for uploading mini-apps.
 
@@ -218,14 +275,42 @@ GET /
 
 **Response**
 HTML upload page with:
+
 - Type selection (BLOCKCHAIN/APP)
 - ZIP file upload with drag & drop
 - Automatic manifest.json validation
 - Auto-generated unique app ID
+- Success message includes generated app_id
 
 ---
 
 ## Mini-App Requirements
+
+### ZIP File Structure
+
+The ZIP file must contain all files in the root level (no wrapper folder):
+
+```
+✅ Correct structure:
+mini-app.zip
+├── manifest.json          # In root
+├── app.js
+├── app.css
+├── assets/
+│   └── icons/
+│       └── app_icon.png
+└── pages/
+    ├── index/
+    │   └── index.html
+    └── send/
+        └── send.html
+
+❌ Wrong structure (with wrapper folder):
+mini-app.zip
+└── my-app/               # No wrapper folder!
+    ├── manifest.json
+    └── ...
+```
 
 ### manifest.json Structure
 
@@ -233,33 +318,54 @@ All mini-apps must include a `manifest.json` file in the root of the ZIP archive
 
 ```json
 {
-  "app_id": "com.example.myapp",  // Will be replaced with auto-generated ID
-  "type": "blockchain",            // Must match selected upload type
-  "name": "My Mini App",           // Required: Display name
-  "version": "1.0.0",              // Required: Version string
-  "icon": "assets/icons/icon.png", // Required: Icon path
-  "pages": [                       // Required: Page list (minimum 1 page)
-    "pages/index/index",          // Required: Must include this exact index page
-    "pages/send/send"             // Optional: Additional pages
+  "app_id": "com.example.myapp", // Ignored - server generates: com.anam.{nanoId}
+  "type": "blockchain", // Ignored - set via upload form
+  "name": "My Mini App", // Required: Display name (max 20 chars)
+  "version": "1.0.0", // Ignored - server sets to "1.0.0"
+  "icon": "assets/icons/icon.png", // Required: Icon file path
+  "pages": [
+    // Required: Page list (minimum 1 page)
+    "pages/index/index", // Required: Must include this exact index page
+    "pages/send/send" // Optional: Additional pages
   ]
 }
 ```
 
 ### Validation Rules
 
-1. **ZIP File**: Only .zip files are accepted
-2. **manifest.json**: Must exist in root directory
-3. **Required Fields**: name, version, type, icon, pages
-4. **Type Matching**: manifest type must match selected upload type
-5. **App ID**: Automatically generated as `com.anam.{nanoId}`
-6. **Icon File**: Must exist at the path specified in manifest.json
-7. **Page Files**: 
+1. **ZIP File Structure**:
+   - Only .zip files are accepted
+   - manifest.json must be in the ZIP root directory (not in a subfolder)
+2. **manifest.json Required Fields**:
+   - `name`: Display name (max 20 characters)
+   - `icon`: Path to icon file
+   - `pages`: Array of page paths
+3. **Auto-generated/Ignored Fields**:
+   - `app_id`: Always auto-generated as `com.anam.{nanoId}`
+   - `type`: Set via upload form selection
+   - `version`: Always set to "1.0.0"
+4. **Icon File**: Must exist at the path specified in manifest.json
+5. **Page Files**:
    - The `pages` array must contain at least one page
    - **MUST** include `pages/index/index` as the entry point
    - All pages listed must have corresponding `.html` files in the ZIP
    - Example: `"pages/index/index"` → requires `pages/index/index.html` file
 
 ---
+
+## File Storage Structure
+
+After upload, files are stored as follows:
+
+```
+/var/anamhub/
+├── miniapp-files/
+│   ├── com.anam.V1StGXR8_Z5jdHi6B.zip
+│   └── com.anam.9D3_bLmN7xK4Hf2Qw.zip
+└── icons/
+    ├── com.anam.V1StGXR8_Z5jdHi6B.png
+    └── com.anam.9D3_bLmN7xK4Hf2Qw.jpg
+```
 
 ## Error Codes
 

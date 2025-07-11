@@ -13,15 +13,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 public class FileUploadController {
 
@@ -76,34 +77,7 @@ public class FileUploadController {
             // pages 파일들 존재 여부 확인 (필수)
             boolean pagesExist = zipModificationService.validatePagesPath(file, manifest.getPages());
             if (!pagesExist) {
-                // 누락된 파일 목록 계산
-                Set<String> missingFiles = new HashSet<>();
-                for (String page : manifest.getPages()) {
-                    String htmlPath = page + ".html";
-                    // ZIP 파일에서 해당 파일 확인
-                    boolean fileExists = false;
-                    try (InputStream is = file.getInputStream();
-                         ZipInputStream zis = new ZipInputStream(is)) {
-                        ZipEntry entry;
-                        while ((entry = zis.getNextEntry()) != null) {
-                            if (htmlPath.equals(entry.getName())) {
-                                fileExists = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!fileExists) {
-                        missingFiles.add(htmlPath);
-                    }
-                }
-                
-                // 특별히 index 페이지가 누락된 경우
-                if (missingFiles.contains("pages/index/index.html")) {
-                    model.addAttribute("message", "❌ Required page 'pages/index/index.html' not found in ZIP file. This file must be included.");
-                } else {
-                    String missingStr = String.join(", ", missingFiles);
-                    model.addAttribute("message", "❌ The following HTML files were not found in ZIP: " + missingStr + " (All files specified in manifest.json pages array must exist)");
-                }
+                model.addAttribute("message", "❌ One or more page files specified in manifest.json were not found. Ensure all HTML files exist at the specified paths.");
                 model.addAttribute("success", false);
                 return "upload";
             }
@@ -118,6 +92,9 @@ public class FileUploadController {
                 return "upload";
             }
             
+            // ZIP 파일명 생성
+            String zipFileName = appId + ".zip";
+            
             // ZIP 파일 수정 (app_id, type, version 추가)
             final File tempModifiedZipFile = zipModificationService.modifyAndRepackageZip(file, manifest, appId, type);
             modifiedZipFile = tempModifiedZipFile;
@@ -128,7 +105,7 @@ public class FileUploadController {
             miniApp.setManifestName(manifest.getName());
             miniApp.setManifestVersion("1.0.0"); // 고정값
             miniApp.setManifestIcon(manifest.getIcon());
-            miniApp.setFileName(file.getOriginalFilename());
+            miniApp.setFileName(zipFileName);
             miniApp.setType(type);
             
             // DB 저장
@@ -154,10 +131,13 @@ public class FileUploadController {
                 public void transferTo(File dest) throws IOException { Files.copy(tempModifiedZipFile.toPath(), dest.toPath()); }
             };
             
-            fileService.saveMiniAppFile(modifiedMultipartFile, file.getOriginalFilename());
+            fileService.saveMiniAppFile(modifiedMultipartFile, zipFileName);
+            
+            // 아이콘 파일 추출 및 저장
+            extractAndSaveIcon(file, manifest.getIcon(), appId);
             
             // 성공 메시지 추가
-            model.addAttribute("message", "✅ Upload successful: " + manifest.getName() + " (v1.0.0)");
+            model.addAttribute("message", "✅ Upload successful: " + manifest.getName() + " (v1.0.0)<br>app_id: " + appId);
             model.addAttribute("success", true);
             
         } catch (Exception e) {
@@ -171,5 +151,48 @@ public class FileUploadController {
         }
 
         return "upload";
+    }
+    
+    // 아이콘 파일 추출 및 저장 메소드
+    private void extractAndSaveIcon(MultipartFile zipFile, String iconPath, String appId) {
+        if (iconPath == null || iconPath.isEmpty()) {
+            return;
+        }
+        
+        try (InputStream is = zipFile.getInputStream();
+             ZipInputStream zis = new ZipInputStream(is)) {
+            
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                if (iconPath.equals(entry.getName())) {
+                    // 아이콘 파일 읽기
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = zis.read(buffer)) > 0) {
+                        baos.write(buffer, 0, len);
+                    }
+                    
+                    // 파일 확장자 추출
+                    String extension = "";
+                    int lastDotIndex = iconPath.lastIndexOf('.');
+                    if (lastDotIndex > 0) {
+                        extension = iconPath.substring(lastDotIndex);
+                    }
+                    
+                    // 아이콘 파일명: appId + 확장자
+                    String iconFileName = appId + extension;
+                    
+                    // 아이콘 저장
+                    fileService.saveIconFile(baos.toByteArray(), iconFileName);
+                    
+                    log.info("Icon extracted and saved: {}", iconFileName);
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            log.error("Failed to extract icon from ZIP: {}", e.getMessage());
+            // 아이콘 추출 실패는 전체 업로드 실패로 처리하지 않음
+        }
     }
 }

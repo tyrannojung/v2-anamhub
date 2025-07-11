@@ -12,6 +12,12 @@ server.port=9090
 # Development: file.mini-app.provide.dir=./uploads/miniapp-files
 file.mini-app.provide.dir=CHANGE_TO_YOUR_UPLOAD_PATH
 
+# Icon file storage directory
+# Windows: file.icon.dir=C:\\anamhub\\icons
+# Mac/Linux: file.icon.dir=/var/anamhub/icons
+# Development: file.icon.dir=./uploads/icons
+file.icon.dir=CHANGE_TO_YOUR_ICON_PATH
+
 # ===== DATABASE SETTINGS =====
 # SQLite configuration (file-based DB)
 spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect

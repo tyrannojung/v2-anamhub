@@ -13,6 +13,7 @@ public class MiniAppResponse {
     private Date createdAt;
     private String name;
     private String version;
+    private String iconUrl;
     
     public static MiniAppResponse from(MiniAppEntity entity) {
         MiniAppResponse response = new MiniAppResponse();
@@ -22,6 +23,8 @@ public class MiniAppResponse {
         response.setCreatedAt(entity.getCreatedAt());
         response.setName(entity.getManifestName());
         response.setVersion(entity.getManifestVersion());
+        // 아이콘 URL 생성 - 별도 엔드포인트로 제공
+        response.setIconUrl("/miniapps/" + entity.getAppId() + "/icon");
         return response;
     }
 }

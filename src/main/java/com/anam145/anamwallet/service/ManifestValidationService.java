@@ -22,6 +22,7 @@ public class ManifestValidationService {
             
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
+                // manifest.json 파일을 루트에서 찾기
                 if ("manifest.json".equals(entry.getName())) {
                     return parseManifest(zis);
                 }

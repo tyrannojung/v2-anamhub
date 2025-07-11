@@ -38,6 +38,7 @@ public class ZipModificationService {
              ZipOutputStream zos = new ZipOutputStream(fos)) {
             
             ZipEntry entry;
+            
             while ((entry = zis.getNextEntry()) != null) {
                 if ("manifest.json".equals(entry.getName())) {
                     // manifest.json을 완전히 새로 생성
@@ -106,7 +107,7 @@ public class ZipModificationService {
             return false; // pages는 필수
         }
         
-        // index 페이지가 포함되어 있는지 확인 (이미 ManifestValidationService에서 체크하지만 중복 확인)
+        // index 페이지가 포함되어 있는지 확인
         boolean hasIndexPage = pages.contains("pages/index/index");
         if (!hasIndexPage) {
             log.error("Required index page 'pages/index/index' not found in manifest");

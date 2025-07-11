@@ -21,6 +21,9 @@ public class FileService {
 
     @Value("${file.mini-app.provide.dir}")
     private String MINI_APP_UPLOAD_DIR;
+    
+    @Value("${file.icon.dir}")
+    private String ICON_DIR;
 
     private void saveFile(MultipartFile file, String miniAppName, String uploadDir) {
         try {
@@ -72,5 +75,45 @@ public class FileService {
 
     public Resource fetchMiniAppFile(String fileName) {
         return fetchFile(fileName, MINI_APP_UPLOAD_DIR);
+    }
+    
+    // 아이콘 파일 저장 (바이트 배열로 저장)
+    public void saveIconFile(byte[] iconData, String iconFileName) {
+        try {
+            Path iconPath = Paths.get(ICON_DIR);
+            
+            if (!iconPath.toFile().exists()) {
+                boolean created = iconPath.toFile().mkdirs();
+                if (!created) {
+                    throw new FileProcessingException("Failed to create icon directory: " + ICON_DIR);
+                }
+            }
+            
+            Path filePath = iconPath.resolve(iconFileName);
+            Files.write(filePath, iconData);
+            
+            log.info("Icon saved successfully: {}", filePath.toAbsolutePath());
+        } catch (IOException e) {
+            log.error("Failed to save icon: {}", iconFileName, e);
+            throw new FileProcessingException("Failed to save icon: " + iconFileName, e);
+        }
+    }
+    
+    // 아이콘 파일 조회
+    public Resource fetchIconFile(String iconFileName) {
+        try {
+            Path iconPath = Paths.get(ICON_DIR).resolve(iconFileName);
+            
+            if (!Files.exists(iconPath)) {
+                throw new FileProcessingException("Icon file not found: " + iconFileName);
+            }
+            
+            Resource resource = new UrlResource(iconPath.toUri());
+            log.info("Icon found: {}", iconPath.toAbsolutePath());
+            return resource;
+        } catch (Exception e) {
+            log.error("Error while fetching icon: {}", iconFileName, e);
+            throw new FileProcessingException("Error while fetching icon: " + iconFileName, e);
+        }
     }
 }

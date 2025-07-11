@@ -61,7 +61,7 @@
       <!-- Message Display -->
       <div th:if="${message}" 
            th:class="${success} ? 'success-message' : 'error-message'" 
-           th:text="${message}"></div>
+           th:utext="${message}"></div>
     </div>
 
     <script th:src="@{/js/upload.js}"></script>
