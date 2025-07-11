@@ -36,6 +36,14 @@ public class FileUploadController {
             return "upload";
         }
 
+        // ZIP 파일 확장자 검증
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.toLowerCase().endsWith(".zip")) {
+            model.addAttribute("message", "❌ ZIP 파일만 업로드 가능합니다");
+            model.addAttribute("success", false);
+            return "upload";
+        }
+
         MiniAppEntity miniApp = new MiniAppEntity();
         miniApp.setFileName(file.getOriginalFilename());
         miniApp.setType(type);
