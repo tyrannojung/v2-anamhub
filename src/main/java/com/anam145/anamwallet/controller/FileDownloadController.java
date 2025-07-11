@@ -23,12 +23,22 @@ public class FileDownloadController {
 
     @GetMapping("/miniapps/{id}/download")
     public ResponseEntity<Resource> getMiniAppFile(@PathVariable String id) {
-        MiniAppEntity miniAppEntity = miniAppService.get(id);
-        Resource resource = fileService.fetchMiniAppFile(miniAppEntity.getFileName());
+        try {
+            MiniAppEntity miniAppEntity = miniAppService.get(id);
+            Resource resource = fileService.fetchMiniAppFile(miniAppEntity.getFileName());
+            
+            // Check if resource exists and is readable
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("Could not read file: " + miniAppEntity.getFileName());
+            }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + miniAppEntity.getFileName() + "\"")
-                .body(resource);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + miniAppEntity.getFileName() + "\"")
+                    .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(resource.contentLength()))
+                    .body(resource);
+        } catch (Exception e) {
+            throw new RuntimeException("File download failed: " + e.getMessage());
+        }
     }
 }
