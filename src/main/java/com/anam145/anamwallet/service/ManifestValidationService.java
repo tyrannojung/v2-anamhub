@@ -71,7 +71,10 @@ public class ManifestValidationService {
         if (manifestAppId != null && manifestAppId.startsWith("com.anam.")) {
             return manifestAppId;
         }
-        // 그렇지 않으면 자동 생성
-        return "com.anam." + NanoIdUtils.randomNanoId();
+        // 그렇지 않으면 자동 생성 - 도메인 호환을 위해 소문자와 하이픈만 사용
+        // 커스텀 알파벳: 소문자와 숫자만 (도메인 친화적)
+        String alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+        String nanoId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, alphabet.toCharArray(), 16);
+        return "com.anam." + nanoId;
     }
 }

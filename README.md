@@ -2,6 +2,14 @@
 
 A simple server for hosting Anam Wallet mini-app modules with automatic manifest validation and unique app ID generation.
 
+## Key Features
+
+- **Domain-Friendly App IDs**: Generates lowercase-only app IDs (com.anam.{16-char-id}) suitable for subdomain usage
+- **Automatic Validation**: Validates manifest.json structure and required fields
+- **Smart File Storage**: Stores ZIP files with appId naming
+- **Icon Management**: Automatically extracts and serves app icons separately
+- **RESTful API**: Clean API for listing, downloading mini-apps, and fetching icons
+
 ## Setup
 
 ### 1. Copy configuration template
@@ -72,22 +80,22 @@ GET /miniapps
   "message": "Found 2 mini-apps",
   "data": [
     {
-      "appId": "com.anam.V1StGXR8_Z5jdHi6B",
-      "fileName": "defi-wallet.zip",
+      "appId": "com.anam.x7k9m2p5q8n3r6w4",
+      "fileName": "com.anam.x7k9m2p5q8n3r6w4.zip",
       "type": "BLOCKCHAIN",
       "createdAt": "2025-01-11T15:30:45.123+09:00",
       "name": "DeFi Wallet",
       "version": "1.0.0",
-      "iconUrl": "/miniapps/com.anam.V1StGXR8_Z5jdHi6B/icon"
+      "iconUrl": "/miniapps/com.anam.x7k9m2p5q8n3r6w4/icon"
     },
     {
-      "appId": "com.anam.9D3_bLmN7xK4Hf2Qw",
-      "fileName": "nft-marketplace.zip",
+      "appId": "com.anam.a3b5c7d9e2f4g6h8",
+      "fileName": "com.anam.a3b5c7d9e2f4g6h8.zip",
       "type": "BLOCKCHAIN",
       "createdAt": "2025-01-10T10:15:30.456+09:00",
       "name": "NFT Marketplace",
       "version": "2.1.0",
-      "iconUrl": "/miniapps/com.anam.9D3_bLmN7xK4Hf2Qw/icon"
+      "iconUrl": "/miniapps/com.anam.a3b5c7d9e2f4g6h8/icon"
     }
   ],
   "timestamp": "2025-01-11T16:45:30.123",
@@ -130,13 +138,13 @@ GET /miniapps/{appId}
   "success": true,
   "message": "Request processed successfully",
   "data": {
-    "appId": "com.anam.V1StGXR8_Z5jdHi6B",
-    "fileName": "defi-wallet.zip",
+    "appId": "com.anam.x7k9m2p5q8n3r6w4",
+    "fileName": "com.anam.x7k9m2p5q8n3r6w4.zip",
     "type": "BLOCKCHAIN",
     "createdAt": "2025-01-11T15:30:45.123+09:00",
     "name": "DeFi Wallet",
     "version": "1.0.0",
-    "iconUrl": "/miniapps/com.anam.V1StGXR8_Z5jdHi6B/icon"
+    "iconUrl": "/miniapps/com.anam.x7k9m2p5q8n3r6w4/icon"
   },
   "timestamp": "2025-01-11T16:45:30.123",
   "code": 200
@@ -341,7 +349,7 @@ All mini-apps must include a `manifest.json` file in the root of the ZIP archive
    - `icon`: Path to icon file
    - `pages`: Array of page paths
 3. **Auto-generated/Ignored Fields**:
-   - `app_id`: Always auto-generated as `com.anam.{nanoId}`
+   - `app_id`: Always auto-generated as `com.anam.{16-lowercase-chars}` (domain-friendly)
    - `type`: Set via upload form selection
    - `version`: Always set to "1.0.0"
 4. **Icon File**: Must exist at the path specified in manifest.json
@@ -360,11 +368,11 @@ After upload, files are stored as follows:
 ```
 /var/anamhub/
 ├── miniapp-files/
-│   ├── com.anam.V1StGXR8_Z5jdHi6B.zip
-│   └── com.anam.9D3_bLmN7xK4Hf2Qw.zip
+│   ├── com.anam.x7k9m2p5q8n3r6w4.zip
+│   └── com.anam.a3b5c7d9e2f4g6h8.zip
 └── icons/
-    ├── com.anam.V1StGXR8_Z5jdHi6B.png
-    └── com.anam.9D3_bLmN7xK4Hf2Qw.jpg
+    ├── com.anam.x7k9m2p5q8n3r6w4.png
+    └── com.anam.a3b5c7d9e2f4g6h8.jpg
 ```
 
 ## Error Codes
