@@ -12,22 +12,36 @@ A simple server for hosting Anam Wallet mini-app modules with automatic manifest
 
 ## Setup
 
-### 1. Copy configuration template
+### 1. Prerequisites
+
+- Java 17 or higher
+- MariaDB 10.5+ or MySQL 8.0+ (default: MariaDB)
+- (Optional) SQLite for simple local development
+
+### 2. Database Setup
+
+#### Option 1: MariaDB (Recommended)
+```sql
+CREATE DATABASE anamhub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+#### Option 2: SQLite
+No setup required - database file will be created automatically.
+
+### 3. Configure Application
 
 ```bash
 cp src/main/resources/application.properties.example src/main/resources/application.properties
 ```
 
-### 2. Update configuration
-
 Edit `application.properties` with your settings:
 
+- Database connection (MariaDB or SQLite)
 - File upload directory path (`file.mini-app.provide.dir`)
 - Icon storage directory path (`file.icon.dir`)
-- Database location (SQLite)
 - Server port (default: 9090)
 
-### 3. Run server
+### 4. Run server
 
 ```bash
 # Development

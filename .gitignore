@@ -67,3 +67,8 @@ Thumbs.db
 ### Environment ###
 .env
 .env.*
+
+### Upload Directories ###
+uploads/
+/uploads/miniapp-files/
+/uploads/icons/

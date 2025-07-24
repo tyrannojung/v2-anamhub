@@ -35,7 +35,7 @@ public class MiniAppEntity {
     @Column(nullable = false)
     private MiniAppType type;
     
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt = new Date();
 }

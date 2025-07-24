@@ -19,19 +19,30 @@ file.mini-app.provide.dir=CHANGE_TO_YOUR_UPLOAD_PATH
 file.icon.dir=CHANGE_TO_YOUR_ICON_PATH
 
 # ===== DATABASE SETTINGS =====
-# SQLite configuration (file-based DB)
-spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+# Choose your preferred database type:
+
+# Option 1: MariaDB/MySQL (Recommended for production)
+spring.datasource.url=jdbc:mariadb://localhost:3306/anamhub
+spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+spring.datasource.username=CHANGE_TO_YOUR_DB_USERNAME
+spring.datasource.password=CHANGE_TO_YOUR_DB_PASSWORD
+spring.jpa.database-platform=org.hibernate.dialect.MariaDBDialect
+
+# Option 2: SQLite (For simple local development)
+# spring.datasource.url=jdbc:sqlite:module.db
+# spring.datasource.driver-class-name=org.sqlite.JDBC
+# spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+
+# JPA/Hibernate configuration
 # Options: create(reset), update(preserve), validate(check only), none
 spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=true
 
-# SQLite file path
-# Relative: jdbc:sqlite:module.db (project root)
-# Absolute: jdbc:sqlite:/var/anamhub/data/module.db
-spring.datasource.url=jdbc:sqlite:module.db
-spring.datasource.driver-class-name=org.sqlite.JDBC
-# SQLite doesn't require username/password but keeping for compatibility
-spring.datasource.username=admin
-spring.datasource.password=CHANGE_TO_YOUR_PASSWORD
+# Connection pool settings (for MariaDB/MySQL)
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=30000
 
 # ===== LOGGING SETTINGS =====
 # Use DEBUG only in development environment
