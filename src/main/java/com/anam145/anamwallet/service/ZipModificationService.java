@@ -50,6 +50,7 @@ public class ZipModificationService {
                     newManifest.setName(originalManifest.getName());
                     newManifest.setIcon(originalManifest.getIcon());
                     newManifest.setPages(originalManifest.getPages());
+                    newManifest.setBridge(originalManifest.getBridge());
                     newManifest.setApp_id(appId);
                     newManifest.setType(type.toString().toLowerCase());
                     newManifest.setVersion("1.0.0");
@@ -151,5 +152,28 @@ public class ZipModificationService {
         }
         
         return allFound;
+    }
+    
+    public boolean validateBridgeScript(MultipartFile zipFile, com.anam145.anamwallet.dto.BridgeConfig bridgeConfig) throws IOException {
+        if (bridgeConfig == null || bridgeConfig.getScript() == null) {
+            return true; // bridge는 선택적 필드이므로 없어도 통과
+        }
+        
+        String scriptPath = bridgeConfig.getScript();
+        
+        try (InputStream is = zipFile.getInputStream();
+             ZipInputStream zis = new ZipInputStream(is)) {
+            
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                if (scriptPath.equals(entry.getName())) {
+                    log.info("Bridge script file found: {}", scriptPath);
+                    return true;
+                }
+            }
+        }
+        
+        log.warn("Bridge script file not found: {}", scriptPath);
+        return false;
     }
 }

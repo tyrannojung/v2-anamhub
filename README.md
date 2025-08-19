@@ -349,6 +349,11 @@ All mini-apps must include a `manifest.json` file in the root of the ZIP archive
     // Required: Page list (minimum 1 page)
     "pages/index/index", // Required: Must include this exact index page
     "pages/send/send" // Optional: Additional pages
+  ],
+  "bridge": [
+    // Optional: Universal Bridge JavaScript files
+    "bridge/dapp-bridge.js", // Optional: Bridge scripts for blockchain integration
+    "bridge/wallet-connector.js" // Optional: Additional bridge modules
   ]
 }
 ```
@@ -362,16 +367,22 @@ All mini-apps must include a `manifest.json` file in the root of the ZIP archive
    - `name`: Display name (max 20 characters)
    - `icon`: Path to icon file
    - `pages`: Array of page paths
-3. **Auto-generated/Ignored Fields**:
+3. **manifest.json Optional Fields**:
+   - `bridge`: Array of Universal Bridge JavaScript file paths (for blockchain integration)
+4. **Auto-generated/Ignored Fields**:
    - `app_id`: Always auto-generated as `com.anam.{16-lowercase-chars}` (domain-friendly)
    - `type`: Set via upload form selection
    - `version`: Always set to "1.0.0"
-4. **Icon File**: Must exist at the path specified in manifest.json
-5. **Page Files**:
+5. **Icon File**: Must exist at the path specified in manifest.json
+6. **Page Files**:
    - The `pages` array must contain at least one page
    - **MUST** include `pages/index/index` as the entry point
    - All pages listed must have corresponding `.html` files in the ZIP
    - Example: `"pages/index/index"` → requires `pages/index/index.html` file
+7. **Bridge Files** (Optional):
+   - If `bridge` array is specified, all listed JavaScript files must exist in the ZIP
+   - Used for Universal Bridge integration in blockchain mini-apps
+   - Example: `"bridge/dapp-bridge.js"` → requires `bridge/dapp-bridge.js` file
 
 ---
 

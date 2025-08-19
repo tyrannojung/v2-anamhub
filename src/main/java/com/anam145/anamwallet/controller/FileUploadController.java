@@ -82,6 +82,15 @@ public class FileUploadController {
                 return "upload";
             }
             
+            // bridge script 파일 존재 여부 확인 (선택적)
+            boolean bridgeValid = zipModificationService.validateBridgeScript(file, manifest.getBridge());
+            if (!bridgeValid) {
+                model.addAttribute("message", "❌ Bridge script file specified in manifest.json was not found. Ensure the JS file exists at the specified path: " + 
+                    (manifest.getBridge() != null ? manifest.getBridge().getScript() : ""));
+                model.addAttribute("success", false);
+                return "upload";
+            }
+            
             // 고유한 app_id 생성 (항상 자동 생성)
             String appId = manifestValidationService.generateAppId(null);
             
